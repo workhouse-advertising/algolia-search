@@ -1,0 +1,13 @@
+{
+    "name": "workhouse-advertising/algolia_search",
+    "description": "Replaces the default Concrete5 search index with Algolia's",
+    "type": "concrete5-package",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Workhouse Advertising",
+            "email": "digital@workhouseadvertising.com.au"
+        }
+    ],
+    "require": {}
+}
