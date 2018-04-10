@@ -122,7 +122,7 @@ class Controller extends BlockController
      */
     public function getBlockTypeName()
     {
-        return t('Search');
+        return t('Algolia Search');
     }
 
     /**
@@ -130,7 +130,7 @@ class Controller extends BlockController
      */
     public function getBlockTypeDescription()
     {
-        return t('Add a search box to your site.');
+        return t('Add algoalia search to you site.');
     }
 
     /**

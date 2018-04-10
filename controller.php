@@ -3,8 +3,9 @@
 namespace Concrete\Package\AlgoliaSearch;
 
 use BlockType;
-use Concrete\Core\Job\Job;
-use Concrete\Core\Package\Package;
+use Config;
+use Job;
+use Package;
 use Concrete\Core\Support\Facade\Application;
 use Concrete\Core\Foundation\Service\ProviderList;
 
@@ -16,7 +17,7 @@ class Controller extends Package
     protected $appVersionRequired = '5.7.4';
     protected $pkgVersion = '1.0';
     protected $pkgAutoloaderRegistries = [
-        'src' => '\AlgoliaSearch'
+        // 'src' => '\AlgoliaSearch'
     ];
 
     public function getPackageName()
@@ -26,7 +27,7 @@ class Controller extends Package
 
     public function getPackageDescription()
     {
-        return t("Replaces the default Concrete5 search index with Algolia's");
+        return t("Adds an Algolia search block and Page indexing");
     }
 
     public function on_start()
@@ -41,9 +42,32 @@ class Controller extends Package
 
     public function install()
     {
-        $pkg = parent::install();
-        $pkg->on_start();
-        $job = Job::installByPackage('index_algolia_search', $pkg);
-        BlockType::installBlockTypeFromPackage('algolia_search', $pkg); 
+        $package = parent::install();
+        $package->on_start();
+        $job = Job::installByPackage('index_algolia_search', $package);
+        BlockType::installBlockTypeFromPackage('algolia_search', $package);
+        // Create default canfigurations
+        if (!Config::get('algolia_search::algolia.application_id')) {
+            Config::set('algolia_search::algolia.application_id', '');
+        }
+        if (!Config::get('algolia_search::algolia.admin_api_key')) {
+            Config::set('algolia_search::algolia.admin_api_key', '');
+        }
+        if (!Config::get('algolia_search::algolia.search_api_key')) {
+            Config::set('algolia_search::algolia.search_api_key', '');
+        }
+        if (!Config::get('algolia_search::algolia.index_key')) {
+            Config::set('algolia_search::algolia.index_key', 'concrete5_search');
+        }
+    }
+
+    public function uninstall()
+    {
+        $package = $this->getPackageEntity();
+        $packageJobs = Job::getListByPackage($package);
+        foreach ($packageJobs as $job) {
+            $job->uninstall();
+        }
+        parent::uninstall();
     }
 }
