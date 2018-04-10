@@ -38,23 +38,36 @@ class IndexAlgoliaSearch extends AbstractJob
         $indexedPages = Database::connection()->fetchAll('SELECT * from PageSearchIndex');
         $validContentIds = [];
         $deleteFilters = [];
+        $errors = [];
+        $successes = 0;
         foreach ($indexedPages as $indexedPage) {
             // Don't show items whose paths contain '/!'
             if (!stristr($indexedPage['cPath'], '/!')) {
                 $validContentIds[] = $indexedPage['cID'];
                 $deleteFilters[] = "objectID:{$indexedPage['cID']}";
-                $this->algoliaIndex->saveObject([
-                    'objectID' => $indexedPage['cID'],
-                    'name' => $indexedPage['cName'],
-                    'content' => $indexedPage['content'],
-                    'description' => $indexedPage['cDescription'],
-                    'path' => $indexedPage['cPath'],
-                ]);
+                try {
+                    $this->algoliaIndex->saveObject([
+                        'objectID' => $indexedPage['cID'],
+                        'name' => $indexedPage['cName'],
+                        // Truncate to 10000 characters to account for Algolia's limits
+                        'content' => substr($indexedPage['content'], 0, 10000),
+                        'description' => substr($indexedPage['cDescription'], 0, 10000),
+                        'path' => $indexedPage['cPath'],
+                    ]);
+                    $successes++;
+                } catch (Exception $e) {
+                    $errors[] = $e->getMessage();
+                }
             }
         }
         if ($validContentIds) {
             $filters = 'NOT objectID:000' . implode(' AND NOT objectID:', $validContentIds);
             $this->algoliaIndex->deleteBy(['filters' => $filters]);
         }
+        $result = "{$successes} records successfully indexed.";
+        if ($errors) {
+            $result .= PHP_EOL . "!!! Errors occurred: " . PHP_EOL . implode(PHP_EOL, $errors);
+        }
+        return $result;
     }
 }
