@@ -31,14 +31,23 @@ if (!isset($query) || !is_string($query)) {
     </div>
 </script>
 <script type="text/javascript">
+    var algoliaClient = algoliasearch('<?= Config::get('algolia_search::algolia.application_id'); ?>', '<?= Config::get('algolia_search::algolia.search_api_key'); ?>');
+    var algoliaIndex = algoliaClient.initIndex('<?= Config::get('algolia_search::algolia.index_key'); ?>');
+    var algoliaResultsContainer, algoliaResultTemplate;
     $(function() {
-        var client = algoliasearch('<?= Config::get('algolia_search::algolia.application_id'); ?>', '<?= Config::get('algolia_search::algolia.search_api_key'); ?>');
-        var index = client.initIndex('<?= Config::get('algolia_search::algolia.index_key'); ?>');
-        var algoliaResultTemplate = _.template($('#algoliaResultTemplate-<?= $bID ?>').html());
-        var algoliaResultsContainer = $('#algoliaResults-<?= $bID ?> .algolia-search-results');
+        algoliaResultsContainer = $('#algoliaResults-<?= $bID ?> .algolia-search-results');
+        algoliaResultTemplate = _.template($('#algoliaResultTemplate-<?= $bID ?>').html());
         var urlParams = _.object(_.compact(_.map(window.location.search.slice(1).split('&'), function(item) {  if (item) return item.split('='); })));
-        index.search({
-                query: urlParams.query
+        triggerAlgoliaSearch(urlParams.query);
+        $('#headerSearchValue').on('keyup', _.debounce(function() {
+            triggerAlgoliaSearch($(this).val());
+        }, 100));
+    });
+
+    function triggerAlgoliaSearch(query) {
+        $('#headerSearchValue').val(query);
+        algoliaIndex.search({
+                query: query
             },
             function searchDone(err, content) {
                 $(algoliaResultsContainer).html('');
@@ -46,8 +55,8 @@ if (!isset($query) || !is_string($query)) {
                 $('#algoliaResults-<?= $bID ?> .algolia-no-results').hide();
                 if (content.hits && content.hits.length > 0) {
                     $(content.hits).each(function(index, hit){
-                        if (hit.content == '') {
-                            hit.content = hit.description;
+                        if (!hit.content || hit.content == '') {
+                            hit.content = (hit.description) ? hit.description : '';
                         }
                         var length = Math.min(hit.content.length, 300);
                         var suffix = (hit.content.length > 100) ? '...' : '   ';
@@ -60,5 +69,5 @@ if (!isset($query) || !is_string($query)) {
                 if (err) throw err;
             }
         );
-    });
+    }
 </script>
