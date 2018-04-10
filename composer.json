@@ -9,5 +9,7 @@
             "email": "digital@workhouseadvertising.com.au"
         }
     ],
-    "require": {}
+    "require": {
+        "algolia/algoliasearch-client-php": "^1.25"
+    }
 }

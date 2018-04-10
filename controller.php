@@ -29,20 +29,20 @@ class Controller extends Package
         return t("Replaces the default Concrete5 search index with Algolia's");
     }
 
-    // public function on_start()
-    // {
-    //     if (!$this->app) {
-    //         $this->app = Application::getFacadeApplication();
-    //     }
-    //     $list = $this->app->make(ProviderList::class);
-    //     $list->registerProvider(AlgoliaSearchProvider::class);
-    // }
+    public function on_start()
+    {
+        require $this->getPackagePath() . '/vendor/autoload.php';
+        // if (!$this->app) {
+        //     $this->app = Application::getFacadeApplication();
+        // }
+        // $list = $this->app->make(ProviderList::class);
+        // $list->registerProvider(AlgoliaSearchProvider::class);
+    }
 
     public function install()
     {
         $pkg = parent::install();
         $pkg->on_start();
-        $job = Job::installByPackage('index_algolia_search', $pkg);
         $job = Job::installByPackage('index_algolia_search', $pkg);
         BlockType::installBlockTypeFromPackage('algolia_search', $pkg); 
     }

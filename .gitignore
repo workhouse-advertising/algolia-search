@@ -1,4 +1,7 @@
-config/site.php
-files/cache/*
-files/tmp/*
-.htaccess
+# Ignore composer stuff
+/vendor/
+
+# Ignore developer stuff
+.idea
+node_modules
+.env
