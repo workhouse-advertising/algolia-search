@@ -42,7 +42,10 @@ class IndexAlgoliaSearch extends AbstractJob
         $successes = 0;
         foreach ($indexedPages as $indexedPage) {
             // Don't show items whose paths contain '/!'
-            if (!stristr($indexedPage['cPath'], '/!')) {
+            $page = $this->getPage($indexedPage['cID']);
+            // if (!stristr($indexedPage['cPath'], '/!')) {
+            // if (!stristr($indexedPage['cPath'], '/!') && !preg_match('/^\/dashboard.*/', $indexedPage['cPath'])) {
+            if ($indexedPage['cPath'] && $page && $page->isActive() && !$page->isPageDraft() && !$page->isSystemPage()) {
                 $validContentIds[] = $indexedPage['cID'];
                 $deleteFilters[] = "objectID:{$indexedPage['cID']}";
                 try {
@@ -69,5 +72,33 @@ class IndexAlgoliaSearch extends AbstractJob
             $result .= PHP_EOL . "!!! Errors occurred: " . PHP_EOL . implode(PHP_EOL, $errors);
         }
         return $result;
+    }
+
+    /**
+     * Get a page based on criteria
+     * @param string|int|Page|Collection $page
+     * @return \Concrete\Core\Page\Page
+     */
+    protected function getPage($page)
+    {
+        // Handle passed cID
+        if (is_numeric($page)) {
+            return Page::getByID($page);
+        }
+
+        // Handle passed /path/to/collection
+        if (is_string($page)) {
+            return Page::getByPath($page);
+        }
+
+        // If it's a page, just return the page
+        if ($page instanceof Page) {
+            return $page;
+        }
+
+        // If it's not a page but it's a collection, lets try getting a page by id
+        if ($page instanceof Collection) {
+            return $this->getPage($page->getCollectionID());
+        }
     }
 }
