@@ -6,6 +6,7 @@ if (!isset($query) || !is_string($query)) {
 ?>
 <?php //// TODO: Add the Algalia search via NPM ?>
 <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 
 <div id="algoliaResults-<?= $bID ?>">
     <div class="input-group col-sm-12 col-md-4">
