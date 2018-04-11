@@ -45,7 +45,7 @@ class IndexAlgoliaSearch extends AbstractJob
             $page = $this->getPage($indexedPage['cID']);
             // if (!stristr($indexedPage['cPath'], '/!')) {
             // if (!stristr($indexedPage['cPath'], '/!') && !preg_match('/^\/dashboard.*/', $indexedPage['cPath'])) {
-            if ($indexedPage['cPath'] && $page && $page->isActive() && !$page->isPageDraft() && !$page->isSystemPage()) {
+            if ($indexedPage['cPath'] && trim($indexedPage['cName']) && $page && $page->isActive() && !$page->isPageDraft() && !$page->isSystemPage()) {
                 $validContentIds[] = $indexedPage['cID'];
                 $deleteFilters[] = "objectID:{$indexedPage['cID']}";
                 try {
