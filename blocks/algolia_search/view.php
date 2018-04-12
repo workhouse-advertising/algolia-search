@@ -34,45 +34,71 @@ if (!isset($query) || !is_string($query)) {
         </p>
     </div>
 </script>
-<script type="text/javascript">
-    var algoliaClient = algoliasearch('<?= Config::get('algolia_search::algolia.application_id'); ?>', '<?= Config::get('algolia_search::algolia.search_api_key'); ?>');
-    var algoliaIndex = algoliaClient.initIndex('<?= Config::get('algolia_search::algolia.index_key'); ?>');
-    var algoliaResultsContainer, algoliaResultTemplate;
-    $(function() {
-        algoliaResultsContainer = $('#algoliaResults-<?= $bID ?> .algolia-search-results');
-        algoliaResultTemplate = _.template($('#algoliaResultTemplate-<?= $bID ?>').html());
-        var urlParams = _.object(_.compact(_.map(window.location.search.slice(1).split('&'), function(item) {  if (item) return item.split('='); })));
-        triggerAlgoliaSearch(urlParams.query);
-        $('.algolia-search-value').on('keyup', _.debounce(function(e) {
-            e.preventDefault();
-            triggerAlgoliaSearch($(this).val());
-        }, 100));
-    });
+<?php if (Config::get('algolia_search::algolia.application_id')): ?>
+    <script type="text/javascript">
+        try {
+            var algoliaClient = algoliasearch('<?= Config::get('algolia_search::algolia.application_id'); ?>', '<?= Config::get('algolia_search::algolia.search_api_key'); ?>');
+            var algoliaIndex = algoliaClient.initIndex('<?= Config::get('algolia_search::algolia.index_key'); ?>');
+            // algoliaIndex.setSettings({
+            //     attributesToHighlight: [
+            //         'description',
+            //         'content'
+            //     ]
+            // });
+            var algoliaResultsContainer, algoliaResultTemplate;
+            $(function() {
+                algoliaResultsContainer = $('#algoliaResults-<?= $bID ?> .algolia-search-results');
+                algoliaResultTemplate = _.template($('#algoliaResultTemplate-<?= $bID ?>').html());
+                var urlParams = _.object(_.compact(_.map(window.location.search.slice(1).split('&'), function(item) {  if (item) return item.split('='); })));
+                triggerAlgoliaSearch(urlParams.query);
+                $('.algolia-search-value').on('keyup', _.debounce(function(e) {
+                    e.preventDefault();
+                    triggerAlgoliaSearch($(this).val());
+                }, 100));
+            });
+        } catch (e) {
+            console.log(e);
+        }
 
-    function triggerAlgoliaSearch(query) {
-        $('.algolia-search-value').val(query);
-        algoliaIndex.search({
-                query: query
-            },
-            function searchDone(err, content) {
-                $(algoliaResultsContainer).html('');
-                $('#algoliaResults-<?= $bID ?> .algolia-searching').hide();
-                $('#algoliaResults-<?= $bID ?> .algolia-no-results').hide();
-                if (content.hits && content.hits.length > 0) {
-                    $(content.hits).each(function(index, hit){
-                        if (!hit.content || hit.content == '') {
-                            hit.content = (hit.description) ? hit.description : '';
-                        }
-                        var length = Math.min(hit.content.length, 300);
-                        var suffix = (hit.content.length > 100) ? '...' : '   ';
-                        hit.content = hit.content.substring(0, length);
-                        $(algoliaResultsContainer).append(algoliaResultTemplate(hit));
-                    });
-                } else {
-                    $('#algoliaResults-<?= $bID ?> .algolia-no-results').show();
+        function triggerAlgoliaSearch(query) {
+            $('.algolia-search-value').val(query);
+            algoliaIndex.search({
+                    query: query
+                },
+                function searchDone(err, content) {
+                    $(algoliaResultsContainer).html('');
+                    $('#algoliaResults-<?= $bID ?> .algolia-searching').hide();
+                    $('#algoliaResults-<?= $bID ?> .algolia-no-results').hide();
+                    if (content.hits && content.hits.length > 0) {
+                        $(content.hits).each(function(index, hit){
+                            if (hit._highlightResult) {
+                                if (hit._highlightResult.name && hit._highlightResult.name.value) {
+                                    hit.name = hit._highlightResult.name.value;
+                                }
+                                if (hit._highlightResult.content && hit._highlightResult.content.value) {
+                                    hit.content = hit._highlightResult.content.value;
+                                }
+                                if (hit._highlightResult.description && hit._highlightResult.description.value) {
+                                    hit.description = hit._highlightResult.description.value;
+                                }
+                                if (hit._highlightResult.path && hit._highlightResult.path.value) {
+                                    hit.path = hit._highlightResult.path.value;
+                                }
+                            }
+                            if (!hit.content || hit.content == '') {
+                                hit.content = (hit.description) ? hit.description : '';
+                            }
+                            var length = Math.min(hit.content.length, 300);
+                            var suffix = (hit.content.length > 100) ? '...' : '   ';
+                            hit.content = hit.content.substring(0, length);
+                            $(algoliaResultsContainer).append(algoliaResultTemplate(hit));
+                        });
+                    } else {
+                        $('#algoliaResults-<?= $bID ?> .algolia-no-results').show();
+                    }
+                    if (err) throw err;
                 }
-                if (err) throw err;
-            }
-        );
-    }
-</script>
+            );
+        }
+    </script>
+<?php endif; ?>

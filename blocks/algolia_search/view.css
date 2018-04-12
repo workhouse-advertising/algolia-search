@@ -19,3 +19,8 @@
 .algolia-search-results .searchResult p {
     margin-top: 4px;
 }
+
+.algolia-search-results em {
+    font-style: normal;
+    background-color: #EFE795;
+}
