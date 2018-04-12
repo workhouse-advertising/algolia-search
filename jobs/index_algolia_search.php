@@ -82,7 +82,7 @@ class IndexAlgoliaSearch extends AbstractJob
                                     // Truncate to 10000 characters to account for Algolia's limits
                                     'content' => substr($faqEntry['description'], 0, 10000),
                                     'description' => '',
-                                    'path' => $pagePath,
+                                    'path' => "{$pagePath}#heading-{$faqEntry['bID']}{$faqEntry['sortOrder']}",
                                 ]);
                                 $successes++;
                             } catch (Exception $e) {
