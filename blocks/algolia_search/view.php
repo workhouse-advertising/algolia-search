@@ -38,7 +38,7 @@ if (!isset($query) || !is_string($query)) {
     <script type="text/javascript">
         try {
             var algoliaClient = algoliasearch('<?= Config::get('algolia_search::algolia.application_id'); ?>', '<?= Config::get('algolia_search::algolia.search_api_key'); ?>');
-            var algoliaIndex = algoliaClient.initIndex('<?= Config::get('algolia_search::algolia.index_key'); ?>');
+            var algoliaIndex = algoliaClient.initIndex('<?= Config::get('algolia_search::algolia.index'); ?>');
             // algoliaIndex.setSettings({
             //     attributesToHighlight: [
             //         'description',
