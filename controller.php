@@ -66,7 +66,9 @@ class Controller extends Package
         $package = $this->getPackageEntity();
         $packageJobs = Job::getListByPackage($package);
         foreach ($packageJobs as $job) {
-            $job->uninstall();
+            if ($job) {
+                $job->uninstall();
+            }
         }
         parent::uninstall();
     }
