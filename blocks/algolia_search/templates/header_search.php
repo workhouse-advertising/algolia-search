@@ -12,7 +12,9 @@
         <?php endforeach; ?>
     <?php endif; ?>
     <input class="form-control algolia-search-value" type="search" placeholder="Search entire site..." aria-label="Search" name="query" value="" id="headerSearchValue" />
-    <button class="btn btn-primary" type="submit"><span class="fa fa-search" aria-hidden="true"></span></button>
+    <?php if ($buttonText): ?>
+        <button class="btn btn-primary" type="submit"><?= $buttonText; ?></button>
+    <?php endif; ?>
 </form>
 <?php if (isset($error) && $error): ?>
     <?= $error; ?>
