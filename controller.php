@@ -15,7 +15,7 @@ class Controller extends Package
 {
     protected $pkgHandle = 'algolia_search';
     protected $appVersionRequired = '5.7.4';
-    protected $pkgVersion = '1.0';
+    protected $pkgVersion = '1.0.0';
     protected $pkgAutoloaderRegistries = [
         // 'src' => '\AlgoliaSearch'
     ];
@@ -46,7 +46,7 @@ class Controller extends Package
         $package->on_start();
         $job = Job::installByPackage('index_algolia_search', $package);
         BlockType::installBlockTypeFromPackage('algolia_search', $package);
-        // Create default canfigurations
+        // Create default configurations
         if (!Config::get('algolia_search::algolia.application_id')) {
             Config::set('algolia_search::algolia.application_id', '');
         }
