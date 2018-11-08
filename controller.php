@@ -16,9 +16,6 @@ class Controller extends Package
     protected $pkgHandle = 'algolia_search';
     protected $appVersionRequired = '5.7.4';
     protected $pkgVersion = '1.0.0';
-    protected $pkgAutoloaderRegistries = [
-        // 'src' => '\AlgoliaSearch'
-    ];
 
     public function getPackageName()
     {
@@ -32,12 +29,7 @@ class Controller extends Package
 
     public function on_start()
     {
-        require $this->getPackagePath() . '/vendor/autoload.php';
-        // if (!$this->app) {
-        //     $this->app = Application::getFacadeApplication();
-        // }
-        // $list = $this->app->make(ProviderList::class);
-        // $list->registerProvider(AlgoliaSearchProvider::class);
+        
     }
 
     public function install()
