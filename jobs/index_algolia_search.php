@@ -78,9 +78,9 @@ class IndexAlgoliaSearch extends AbstractJob
                                     'objectID' => "Faq::{$faqEntry['id']}",
                                     'reference' => $faqEntry['id'],
                                     'type' => 'faq',
-                                    'name' => $faqEntry['title'],
+                                    'name' => $faqEntry['linkTitle'],
                                     // Truncate to 10000 characters to account for Algolia's limits
-                                    'content' => substr($faqEntry['description'], 0, 10000),
+                                    'content' => substr($faqEntry['title'] . " " . $faqEntry['description'], 0, 10000),
                                     'description' => '',
                                     'path' => "{$pagePath}#heading-{$faqEntry['bID']}{$faqEntry['sortOrder']}",
                                 ]);
@@ -101,7 +101,9 @@ class IndexAlgoliaSearch extends AbstractJob
             $page = $this->getPage($indexedPage['cID']);
             // if (!stristr($indexedPage['cPath'], '/!')) {
             // if (!stristr($indexedPage['cPath'], '/!') && !preg_match('/^\/dashboard.*/', $indexedPage['cPath'])) {
-            if ($indexedPage['cPath'] && trim($indexedPage['cName']) && $page && $page->isActive() && !$page->isPageDraft() && !$page->isSystemPage()) {
+            $pageHasPath = ($indexedPage['cPath'] && trim($indexedPage['cName']) && $page);
+            $isHomePage = ($page && $page->isHomePage());
+            if (($pageHasPath || $isHomePage) && $page->isActive() && !$page->isPageDraft() && !$page->isSystemPage()) {
                 $validPageIds[] = $indexedPage['cID'];
                 try {
                     $this->algoliaIndex->saveObject([
@@ -112,7 +114,7 @@ class IndexAlgoliaSearch extends AbstractJob
                         // Truncate to 10000 characters to account for Algolia's limits
                         'content' => substr($indexedPage['content'], 0, 10000),
                         'description' => substr($indexedPage['cDescription'], 0, 10000),
-                        'path' => $indexedPage['cPath'],
+                        'path' => $indexedPage['cPath'] ?? '/',
                     ]);
                     $successes++;
                 } catch (Exception $e) {
