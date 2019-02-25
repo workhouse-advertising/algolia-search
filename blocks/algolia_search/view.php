@@ -1,12 +1,14 @@
 <?php defined('C5_EXECUTE') or die('Access Denied.');
-// use Config;
+$currentPage = Page::getCurrentPage();
 if (!isset($query) || !is_string($query)) {
     $query = '';
 }
 ?>
-<?php //// TODO: Add the Algalia search via NPM ?>
-<script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<?php if (!$currentPage->isEditMode()): ?>
+    <?php //// TODO: Add the Algalia search via NPM ?>
+    <script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<?php endif; ?>
 
 <div id="algoliaResults-<?= $bID ?>">
     <div class="input-group col-sm-12 col-md-4">
@@ -34,7 +36,7 @@ if (!isset($query) || !is_string($query)) {
         </p>
     </div>
 </script>
-<?php if (Config::get('algolia_search::algolia.application_id')): ?>
+<?php if (Config::get('algolia_search::algolia.application_id') && !$currentPage->isEditMode()): ?>
     <script type="text/javascript">
         try {
             var algoliaClient = algoliasearch('<?= Config::get('algolia_search::algolia.application_id'); ?>', '<?= Config::get('algolia_search::algolia.search_api_key'); ?>');
